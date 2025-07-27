@@ -407,3 +407,29 @@ body {
   color: #fff;
   border-color: #d30035;
 }
+
+/* Web search result styles */
+.web-link {
+  color: #007bff;
+  text-decoration: none;
+  word-break: break-all;
+}
+
+.web-link:hover {
+  text-decoration: underline;
+  color: #0056b3;
+}
+
+.citation {
+  background: #f0f8ff;
+  padding: 10px;
+  margin: 10px 0;
+  border-radius: 5px;
+  border-left: 3px solid #007bff;
+  font-size: 0.9em;
+  color: #495057;
+}
+
+.citation strong {
+  color: #007bff;
+}

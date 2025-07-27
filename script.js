@@ -1,12 +1,10 @@
 /* Global variables */
 let selectedProducts = [];
 let expandedDescriptions = {};
-let chatHistory = [
-  {
-    role: "system",
-    content: "You are a skincare and beauty expert who creates personalized routines. Only provide information directly related to skincare/beauty routines and the provided products. Do not answer questions or provide information on unrelated topics."
-  }
-];
+let chatHistory = [{
+  role: "system",
+  content: "You are Lourie, a dedicated beauty advisor and skincare expert who specializes in creating personalized beauty and skincare routines. You will focus exclusively on providing guidance about skincare/beauty routines and the specific products selected. You will structure your recommendations as follows: 1. A clear morning routine with numbered steps and sub-steps, 2. A detailed evening routine with numbered steps and sub-steps, 3. Specific instructions for how to properly use each product, 4. Important recommendations and any safety warnings to keep in mind. You will only assist with beauty and skincare related questions. You will help create perfect personalized routines with clear, concise, numbered steps that are easy to follow. When providing information about L'Oréal products, use web search to find the most current and accurate information, including latest formulations, reviews, and recommendations. Always cite your sources and include relevant links when sharing information from the web."
+}];
 // Initialize clear button reference
 let clearBtn = null;
 
@@ -46,7 +44,7 @@ function setupEventListeners() {
     </div>`;
 
     try {
-      // Prepare the data to send to OpenAI
+      // Prepare full product data for the model
       const productData = selectedProducts.map(product => ({
         name: product.name,
         brand: product.brand,
@@ -54,20 +52,15 @@ function setupEventListeners() {
         description: product.description || "No description available"
       }));
 
+      // Get just the product names for display in the prompt
+      const productNames = selectedProducts.map(product => product.name);
+
       // Create a prompt for the OpenAI API
       const prompt = `
         Create a personalized skincare/beauty routine using these products:
-        ${JSON.stringify(productData)}
+        ${JSON.stringify(productNames)}
         
-        Please include:
-        1. Morning and evening steps in order
-        2. How to use each product correctly
-        3. Any additional recommendations or warnings
-        
-        Format the response in a clear, step-by-step routine.
-        
-        Requirements: Only provide information directly related to skincare/beauty routines and the provided products. 
-        Do not answer questions or provide information on unrelated topics.
+        Please search for the latest information about these L'Oréal products to provide the most current recommendations, including any recent formulation updates, reviews, or expert advice. Include relevant links and citations from your web search.
       `;
 
       // Add the user's initial request to chat history
@@ -86,7 +79,7 @@ function setupEventListeners() {
       console.error("Error generating routine:", error);
       chatWindow.innerHTML = `<div class="chat-message error">
         <p>Error: ${error.message || 'An unknown error occurred'}</p>
-        <p>Please try again or check your API configuration.</p>
+        <p>Please try again in a moment.</p>
       </div>`;
     }
   });
@@ -395,6 +388,18 @@ function formatAIResponse(response) {
   if (formatted.includes('<li>')) {
     formatted = formatted.replace(/((<li>.*?<\/li>)+)/g, '<ol>$1</ol>');
   }
+  
+  // Convert URLs to clickable links
+  formatted = formatted.replace(
+    /(https?:\/\/[^\s<>"{}|\\^`\[\]]+)/g, 
+    '<a href="$1" target="_blank" rel="noopener noreferrer" class="web-link">$1</a>'
+  );
+  
+  // Style citations and sources
+  formatted = formatted.replace(
+    /(Source[s]?:|Citation[s]?:|Reference[s]?:)(.*?)(<br>|$)/gi,
+    '<div class="citation"><strong>$1</strong>$2</div>'
+  );
   
   return formatted;
 }

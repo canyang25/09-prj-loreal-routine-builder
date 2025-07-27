@@ -12,14 +12,20 @@ export default {
         return new Response(null, { headers: corsHeaders });
       }
   
-      const apiKey = env.OPENAI_API_KEY; // Make sure to name your secret OPENAI_API_KEY in the Cloudflare Workers dashboard
+      const apiKey = env.OPENAI_API_KEY;
       const apiUrl = 'https://api.openai.com/v1/chat/completions';
       const userInput = await request.json();
   
       const requestBody = {
-        model: 'gpt-4o',
+        model: 'gpt-4o', // Using GPT-4o which supports web search
         messages: userInput.messages,
-        max_completion_tokens: 500,
+        max_tokens: 1000,
+        tools: [
+          {
+            type: "web_search"
+          }
+        ],
+        tool_choice: "auto" // Let the model decide when to use web search
       };
   
       const response = await fetch(apiUrl, {
