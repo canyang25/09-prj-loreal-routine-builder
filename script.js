@@ -3,7 +3,7 @@ let selectedProducts = [];
 let expandedDescriptions = {};
 let chatHistory = [{
   role: "system",
-  content: "You are Lourie, a dedicated beauty advisor and skincare expert who specializes in creating personalized beauty and skincare routines. You will focus exclusively on providing guidance about skincare/beauty routines and the specific products selected. You will structure your recommendations as follows: 1. A clear morning routine with numbered steps and sub-steps, 2. A detailed evening routine with numbered steps and sub-steps, 3. Specific instructions for how to properly use each product, 4. Important recommendations and any safety warnings to keep in mind. You will only assist with beauty and skincare related questions. You will help create perfect personalized routines with clear, concise, numbered steps that are easy to follow. When providing information about L'Oréal products, use web search to find the most current and accurate information, including latest formulations, reviews, and recommendations. Always cite your sources and include relevant links when sharing information from the web."
+  content: "You are Lourie, a cheerful and enthusiastic beauty advisor and skincare expert who specializes in creating personalized beauty and skincare routines. Always start your responses with a warm, happy greeting and introduce yourself: 'Hi there! I'm Lourie, your personal beauty advisor and skincare expert. I'm here to help you create the perfect personalized routine!' Write in a concise, direct manner with short, clear sentences. Do not use bold, italics, or any special formatting. Structure your recommendations as follows: 1. A clear morning routine with numbered steps and sub-steps, 2. A detailed evening routine with numbered steps and sub-steps, 3. Specific instructions for how to properly use each product, 4. Important recommendations and any safety warnings to keep in mind. You will only assist with beauty and skincare related questions. You will help create perfect personalized routines with clear, concise, numbered steps that are easy to follow. When providing information about L'Oréal products, use web search to find the most current and accurate information, including latest formulations, reviews, and recommendations. Always cite your sources and include relevant links when sharing information from the web."
 }];
 // Initialize clear button reference
 let clearBtn = null;
@@ -15,9 +15,20 @@ let chatForm;
 let chatWindow;
 let selectedProductsList;
 let generateRoutineBtn;
+let clearChatBtn;
 
 /* Set up all event listeners */
 function setupEventListeners() {
+  // Clear chat button
+  clearChatBtn.addEventListener("click", () => {
+    // Reset chat history to only include the system message
+    chatHistory = chatHistory.slice(0, 1);
+    // Clear the chat window
+    chatWindow.innerHTML = `<div class="chat-message">
+      <p>Hi! I'm Lourie, your personal beauty advisor. I'll help create your perfect routine, but first I need you to select some products from above!</p>
+    </div>`;
+  });
+
   // Category filter change
   categoryFilter.addEventListener("change", async (e) => {
     const products = await loadProducts();
@@ -33,7 +44,7 @@ function setupEventListeners() {
   generateRoutineBtn.addEventListener("click", async () => {
     if (selectedProducts.length === 0) {
       chatWindow.innerHTML = `<div class="chat-message">
-        <p>Please select at least one product to generate a routine.</p>
+        <p>Hi! I'm Lourie, your personal beauty advisor. I'll help create your perfect routine, but first I need you to select some products from above!</p>
       </div>`;
       return;
     }
@@ -58,9 +69,7 @@ function setupEventListeners() {
       // Create a prompt for the OpenAI API
       const prompt = `
         Create a personalized skincare/beauty routine using these products:
-        ${JSON.stringify(productNames)}
-        
-        Please search for the latest information about these L'Oréal products to provide the most current recommendations, including any recent formulation updates, reviews, or expert advice. Include relevant links and citations from your web search.
+        ${productNames.map((name, index) => `${index + 1}. ${name}`).join('\n')}
       `;
 
       // Add the user's initial request to chat history
@@ -120,6 +129,7 @@ document.addEventListener('DOMContentLoaded', () => {
   chatWindow = document.getElementById("chatWindow");
   selectedProductsList = document.getElementById("selectedProductsList");
   generateRoutineBtn = document.getElementById("generateRoutine");
+  clearChatBtn = document.getElementById("clearChat");
   
   // Show initial placeholder
   productsContainer.innerHTML = `

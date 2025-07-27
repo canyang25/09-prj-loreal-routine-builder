@@ -66,9 +66,35 @@ body {
   padding: 26px;
 }
 
+.chat-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
 .chatbox h2 {
   font-size: 20px;
-  margin-bottom: 20px;
+  margin-bottom: 0;
+}
+
+.clear-chat-btn {
+  background: #f1f1f1;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  padding: 6px 12px;
+  font-size: 0.9em;
+  color: #666;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  transition: all 0.2s ease;
+}
+
+.clear-chat-btn:hover {
+  background: #e5e5e5;
+  color: #333;
 }
 
 .chat-window {
