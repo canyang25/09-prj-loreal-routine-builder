@@ -16,17 +16,32 @@ let chatWindow;
 let selectedProductsList;
 let generateRoutineBtn;
 let clearChatBtn;
+let ltrBtn;
+let rtlBtn;
 
 /* Set up all event listeners */
 function setupEventListeners() {
+  // RTL/LTR language switcher
+  ltrBtn.addEventListener("click", () => {
+    document.documentElement.setAttribute("dir", "ltr");
+    ltrBtn.classList.add("active");
+    rtlBtn.classList.remove("active");
+    localStorage.setItem("textDirection", "ltr");
+  });
+  
+  rtlBtn.addEventListener("click", () => {
+    document.documentElement.setAttribute("dir", "rtl");
+    rtlBtn.classList.add("active");
+    ltrBtn.classList.remove("active");
+    localStorage.setItem("textDirection", "rtl");
+  });
+  
   // Clear chat button
   clearChatBtn.addEventListener("click", () => {
     // Reset chat history to only include the system message
     chatHistory = chatHistory.slice(0, 1);
     // Clear the chat window
-    chatWindow.innerHTML = `<div class="chat-message">
-      <p>Hi! I'm Lourie, your personal beauty advisor. I'll help create your perfect routine, but first I need you to select some products from above!</p>
-    </div>`;
+    chatWindow.innerHTML = '';
   });
 
   // Category filter change
@@ -130,6 +145,8 @@ document.addEventListener('DOMContentLoaded', () => {
   selectedProductsList = document.getElementById("selectedProductsList");
   generateRoutineBtn = document.getElementById("generateRoutine");
   clearChatBtn = document.getElementById("clearChat");
+  ltrBtn = document.getElementById("ltrBtn");
+  rtlBtn = document.getElementById("rtlBtn");
   
   // Show initial placeholder
   productsContainer.innerHTML = `
@@ -144,6 +161,9 @@ document.addEventListener('DOMContentLoaded', () => {
   // Load saved products
   loadSelectedProductsFromStorage();
   updateSelectedProductsList();
+  
+  // Load saved text direction preference
+  loadTextDirection();
 });
 
 // Remove the direct initialization that was added as a fallback
@@ -430,4 +450,18 @@ function renderChatHistory() {
       }
     })
     .join("");
+}
+
+// Load text direction preference from localStorage
+function loadTextDirection() {
+  const direction = localStorage.getItem("textDirection");
+  if (direction === "rtl") {
+    document.documentElement.setAttribute("dir", "rtl");
+    rtlBtn.classList.add("active");
+    ltrBtn.classList.remove("active");
+  } else {
+    document.documentElement.setAttribute("dir", "ltr");
+    ltrBtn.classList.add("active");
+    rtlBtn.classList.remove("active");
+  }
 }
