@@ -1,31 +1,26 @@
 export default {
     async fetch(request, env) {
-      const corsHeaders = {
-        'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
-        'Access-Control-Allow-Headers': 'Content-Type',
-        'Content-Type': 'application/json'
-      };
+          const corsHeaders = {
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+      'Access-Control-Allow-Headers': 'Content-Type, Authorization, Accept',
+      'Content-Type': 'application/json'
+    };
   
       // Handle CORS preflight requests
       if (request.method === 'OPTIONS') {
         return new Response(null, { headers: corsHeaders });
       }
   
-      const apiKey = env.OPENAI_API_KEY;
-      const apiUrl = 'https://api.openai.com/v1/chat/completions';
+      const apiKey = env.MISTRAL_API;
+      const apiUrl = 'https://api.mistral.ai/v1/chat/completions';
       const userInput = await request.json();
   
       const requestBody = {
-        model: 'gpt-4o', // Using GPT-4o which supports web search
+        model: 'mistral-small-latest', // Using Mistral's small model
         messages: userInput.messages,
         max_tokens: 1000,
-        tools: [
-          {
-            type: "web_search"
-          }
-        ],
-        tool_choice: "auto" // Let the model decide when to use web search
+        temperature: 0.7
       };
   
       const response = await fetch(apiUrl, {
