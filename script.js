@@ -102,14 +102,14 @@ function setupEventListeners() {
   // Generate routine button
   generateRoutineBtn.addEventListener("click", async () => {
     if (selectedProducts.length === 0) {
-      chatWindow.innerHTML = `<div class="chat-message">
+      chatWindow.innerHTML = `<div class="chat-message assistant">
         <p>Hi! I'm Lourie, your personal beauty advisor. I'll help create your perfect routine, but first I need you to select some products from above!</p>
       </div>`;
       return;
     }
 
     // Show loading state
-    chatWindow.innerHTML = `<div class="chat-message">
+    chatWindow.innerHTML = `<div class="chat-message assistant">
       <p><i class="fa-solid fa-spinner fa-spin"></i> Generating your personalized routine...</p>
     </div>`;
 
@@ -162,8 +162,10 @@ function setupEventListeners() {
     chatHistory.push({ role: "user", content: userInput });
     renderChatHistory();
 
+    chatForm.reset();
+
     // Show loading state
-    chatWindow.innerHTML += `<div class="chat-message"><i class="fa-solid fa-spinner fa-spin"></i> Thinking...</div>`;
+    chatWindow.innerHTML += `<div class="chat-message assistant"><i class="fa-solid fa-spinner fa-spin"></i> Thinking...</div>`;
 
     try {
       // Call the OpenAI API with the full chat history
@@ -175,7 +177,6 @@ function setupEventListeners() {
       console.error("Error generating follow-up:", error);
       chatWindow.innerHTML += `<div class="chat-message error"><p>Error: ${error.message || 'An unknown error occurred'}</p></div>`;
     }
-    chatForm.reset();
   });
 }
 
@@ -457,9 +458,9 @@ function renderChatHistory() {
     .filter(msg => msg.role !== "system")
     .map(msg => {
       if (msg.role === "user") {
-        return `<div class="chat-message user"><strong>You:</strong> ${msg.content}</div>`;
+        return `<div class="chat-message user">${msg.content}</div>`;
       } else {
-        return `<div class="chat-message">${formatAIResponse(msg.content)}</div>`;
+        return `<div class="chat-message assistant"><strong>Lourie:</strong> ${formatAIResponse(msg.content)}</div>`;
       }
     })
     .join("");
