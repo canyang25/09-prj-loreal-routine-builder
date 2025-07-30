@@ -11,6 +11,12 @@ body {
   color: #333;
   display: flex;
   justify-content: center;
+  background-image: url('img/bharath-kumar-x8W8Sq93a0c-unsplash.jpg');
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center top;
+  background-attachment: fixed;
+  min-height: 100vh;
 }
 
 .page-wrapper {
@@ -21,16 +27,16 @@ body {
 /* header */
 .site-header {
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
-  flex-wrap: wrap;
   padding-top: 50px;
   padding-bottom: 10px;
 }
 
 .logo {
   width: 250px;
-  margin-bottom: 15px;
+  margin-bottom: px;
 }
 
 .site-title {
@@ -49,16 +55,44 @@ body {
   width: 100%;
   padding: 16px;
   font-size: 18px;
-  border: 2px solid #000;
+  color: #666;
+  border: 2px solid #060000;
   border-radius: 8px;
   cursor: pointer;
-  background-color: white;
+  background: transparent;
   font-weight: 500;
+  transition: background 0.3s, border-color 0.3s;
+}
+
+/* Pure hover state - only applies when the mouse is over the element */
+.search-section select:hover {
+  background: rgba(102, 102, 102, 0.1);
+  border-color: #666;
 }
 
 .search-section select:focus {
   outline: none;
   border-color: #666;
+  box-shadow: 0 0 0 2px rgba(102, 102, 102, 0.2);
+}
+
+/* Force dropdown to blur when clicking elsewhere using JS
+   Add this script to index.html before closing body tag:
+   <script>
+     document.addEventListener('click', function(e) {
+       if (!e.target.closest('.search-section')) {
+         document.querySelector('#categoryFilter').blur();
+       }
+     });
+   </script>
+*/
+.search-section select option {
+  color: #070101;
+}
+
+/* Style for "Choose a Category" option */
+.search-section select option[value=""] {
+  color: #666;
 }
 
 /* chat section */
@@ -82,7 +116,7 @@ body {
 }
 
 .clear-chat-btn {
-  background: #f1f1f1;
+  background: transparent;
   border: 1px solid #ddd;
   border-radius: 6px;
   padding: 6px 12px;
@@ -106,7 +140,7 @@ body {
   line-height: 1.5;
   height: 400px;
   overflow-y: auto;
-  background: #fafafa;
+  background: transparent;
   margin-bottom: 20px;
 }
 
@@ -117,6 +151,20 @@ body {
   padding: 40px;
   color: #666;
   font-size: 18px;
+}
+
+/* Specific style for the selected products placeholder */
+#selectedProductsList .placeholder-message {
+  padding: 20px;
+  font-size: 16px;
+  text-align: center;
+  height: auto;
+  min-height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  margin: 0;
 }
 
 /* input row */
@@ -207,15 +255,42 @@ body {
   margin: 30px 0;
 }
 
+/* Cascade animation */
+@keyframes cascadeIn {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Dynamic cascade delay using CSS custom property */
+.product-card.animate-in {
+  animation-delay: calc(var(--card-index) * 0.1s);
+}
+
 .product-card {
   flex: 0 1 calc(33.333% - 14px);
-  border: 1px solid #ccc;
+  border: 1px solid #070101;
   padding: 15px;
   border-radius: 4px;
   display: flex;
   gap: 15px;
   min-height: 160px;
   position: relative;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.product-card.animate-in {
+  animation: cascadeIn 0.6s ease forwards;
+  opacity: 0;
+  transform: translateY(30px);
+}
+
+.product-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+  border-color: #007bff;
 }
 
 .product-card img {
@@ -236,6 +311,36 @@ body {
 .product-card h3 {
   font-size: 16px;
   margin-bottom: 8px;
+  height: 38px; /* Fixed height for title */
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 2; /* Limit to 2 lines */
+  -webkit-box-orient: vertical;
+  text-overflow: ellipsis;
+  position: relative; /* For tooltip positioning */
+}
+
+/* Tooltip for truncated product titles */
+.product-card h3:hover {
+  overflow: visible;
+  z-index: 10;
+}
+
+.product-card h3:hover::after {
+  content: attr(title);
+  position: absolute;
+  left: 0;
+  top: 100%;
+  width: 100%;
+  background-color: #fff;
+  border: 1px solid #ccc;
+  padding: 5px;
+  border-radius: 4px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+  font-size: 14px;
+  z-index: 20;
+  white-space: normal;
+  word-wrap: break-word;
 }
 
 .product-card p {
@@ -249,22 +354,33 @@ body {
   padding: 20px;
   border: 2px solid #000;
   border-radius: 8px;
+  min-height: 200px; /* Increased minimum height */
+  position: relative; /* Added for absolute positioning of button */
+  padding-bottom: 80px; /* Space for the button */
+}
+
+.selected-products-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
 }
 
 .selected-products h2 {
   font-size: 20px;
-  margin-bottom: 20px;
+  margin-bottom: 0;
 }
 
 #selectedProductsList {
   display: flex;
   flex-wrap: wrap;
   gap: 10px;
+  min-height: 80px;
+  flex-grow: 1; /* Allow it to grow but not shrink below min-height */
 }
 
 .generate-btn {
-  width: 100%;
-  margin-top: 20px;
+  width: calc(100% - 40px); /* Account for container padding */
   padding: 16px;
   font-size: 18px;
   font-weight: 500;
@@ -274,6 +390,10 @@ body {
   border-radius: 8px;
   cursor: pointer;
   transition: background 0.3s;
+  position: absolute; /* Fixed position at the bottom */
+  bottom: 20px;
+  left: 20px;
+  right: 20px;
 }
 
 .generate-btn:hover {
@@ -339,14 +459,19 @@ body {
 }
 
 .toggle-description-btn {
-  background: #f5f5f5;
-  border: 1px solid #ccc;
+  background: transparent;
+  border: 1px solid #070000;
   border-radius: 4px;
   padding: 4px 10px;
   margin: 8px 0 0 0;
   font-size: 0.95em;
   cursor: pointer;
-  transition: background 0.2s, border 0.2s;
+  transition: all 0.2s ease;
+}
+
+.toggle-description-btn:hover {
+  transform: translateX(3px);
+  background: rgba(0, 0, 0, 0.05);
 }
 .toggle-description-btn[aria-expanded="true"] {
   background: #e6f0ff;
@@ -418,24 +543,7 @@ body {
   color: #d30035;
 }
 
-.clear-selected-btn {
-  background: #fff0f0;
-  color: #d30035;
-  border: 1px solid #ff003b;
-  border-radius: 6px;
-  padding: 6px 16px;
-  font-size: 0.98em;
-  font-weight: 500;
-  margin-top: 10px;
-  margin-left: 8px;
-  cursor: pointer;
-  transition: background 0.2s, color 0.2s, border 0.2s;
-}
-.clear-selected-btn:hover {
-  background: #ff003b;
-  color: #fff;
-  border-color: #d30035;
-}
+
 
 /* Web search result styles */
 .web-link {
@@ -524,28 +632,4 @@ html[dir="rtl"] .generate-btn i {
 }
 
 /* Language Switcher */
-.language-switcher {
-  display: flex;
-  gap: 5px;
-  margin-left: auto;
-}
 
-.lang-btn {
-  background: #f5f5f5;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  padding: 4px 10px;
-  cursor: pointer;
-  font-size: 14px;
-  transition: all 0.2s ease;
-}
-
-.lang-btn:hover {
-  background: #e5e5e5;
-}
-
-.lang-btn.active {
-  background: #333;
-  color: white;
-  border-color: #333;
-}

@@ -5,8 +5,7 @@ let chatHistory = [{
   role: "system",
   content: "You are Lourie, a cheerful and enthusiastic beauty advisor and skincare expert who specializes in creating personalized beauty and skincare routines. Always start your responses with a warm, happy greeting and introduce yourself: 'Hi there! I'm Lourie, your personal beauty advisor and skincare expert. I'm here to help you create the perfect personalized routine!' Write in a concise, direct manner with short, clear sentences. Do not use bold, italics, or any special formatting. Structure your recommendations as follows: 1. A clear morning routine with numbered steps and sub-steps, 2. A detailed evening routine with numbered steps and sub-steps, 3. Specific instructions for how to properly use each product, 4. Important recommendations and any safety warnings to keep in mind. You will only assist with beauty and skincare related questions. You will help create perfect personalized routines with clear, concise, numbered steps that are easy to follow. When providing information about L'Oréal products, use web search to find the most current and accurate information, including latest formulations, reviews, and recommendations. Always cite your sources and include relevant links when sharing information from the web."
 }];
-// Initialize clear button reference
-let clearBtn = null;
+
 
 // DOM element references - will be initialized when DOM is ready
 let categoryFilter;
@@ -16,25 +15,23 @@ let chatWindow;
 let selectedProductsList;
 let generateRoutineBtn;
 let clearChatBtn;
-let ltrBtn;
-let rtlBtn;
+
+// RTL languages
+const rtlLanguages = ['ar', 'he', 'fa', 'ur'];
+
+
+
+// Single function to set direction based on language
+function setDirectionFromLanguage(langCode) {
+  const direction = rtlLanguages.includes(langCode) ? 'rtl' : 'ltr';
+  document.documentElement.setAttribute('dir', direction);
+  return direction;
+}
 
 /* Set up all event listeners */
 function setupEventListeners() {
-  // RTL/LTR language switcher
-  ltrBtn.addEventListener("click", () => {
-    document.documentElement.setAttribute("dir", "ltr");
-    ltrBtn.classList.add("active");
-    rtlBtn.classList.remove("active");
-    localStorage.setItem("textDirection", "ltr");
-  });
-  
-  rtlBtn.addEventListener("click", () => {
-    document.documentElement.setAttribute("dir", "rtl");
-    rtlBtn.classList.add("active");
-    ltrBtn.classList.remove("active");
-    localStorage.setItem("textDirection", "rtl");
-  });
+  // Set up Google Translate observer
+  setupGoogleTranslateObserver();
   
   // Clear chat button
   clearChatBtn.addEventListener("click", () => {
@@ -46,12 +43,24 @@ function setupEventListeners() {
 
   // Category filter change
   categoryFilter.addEventListener("change", async (e) => {
-    const products = await loadProducts();
     const selectedCategory = e.target.value;
+    
+    // If no category selected, show placeholder
+    if (!selectedCategory) {
+      productsContainer.innerHTML = `
+        <div class="placeholder-message">
+          Select a category to view products
+        </div>
+      `;
+      // Clear display, ready for next category selection
+      return;
+    }
+    
+    const products = await loadProducts();
     const filteredProducts = products.filter(
       (product) => product.category === selectedCategory
     );
-    displayProducts(filteredProducts);
+    displayProducts(filteredProducts, true); // Enable animation for new category
     updateSelectedProductsList();
   });
   
@@ -145,8 +154,6 @@ document.addEventListener('DOMContentLoaded', () => {
   selectedProductsList = document.getElementById("selectedProductsList");
   generateRoutineBtn = document.getElementById("generateRoutine");
   clearChatBtn = document.getElementById("clearChat");
-  ltrBtn = document.getElementById("ltrBtn");
-  rtlBtn = document.getElementById("rtlBtn");
   
   // Show initial placeholder
   productsContainer.innerHTML = `
@@ -161,9 +168,6 @@ document.addEventListener('DOMContentLoaded', () => {
   // Load saved products
   loadSelectedProductsFromStorage();
   updateSelectedProductsList();
-  
-  // Load saved text direction preference
-  loadTextDirection();
 });
 
 // Remove the direct initialization that was added as a fallback
@@ -203,7 +207,6 @@ function updateSelectedProductsList() {
   saveSelectedProducts();
   if (selectedProducts.length === 0) {
     selectedProductsList.innerHTML = '<div class="placeholder-message">No products selected</div>';
-    if (clearBtn) clearBtn.style.display = 'none';
     return;
   }
   selectedProductsList.innerHTML = selectedProducts
@@ -240,49 +243,24 @@ function updateSelectedProductsList() {
       }
     });
   });
-  addClearAllButton();
-  if (clearBtn) clearBtn.style.display = 'inline-block';
+
 }
 
-function addClearAllButton() {
-  if (!clearBtn) {
-    clearBtn = document.createElement('button');
-    clearBtn.id = 'clearSelectedProducts';
-    clearBtn.className = 'clear-selected-btn';
-    clearBtn.innerHTML = 'Clear All';
-    clearBtn.addEventListener('click', () => {
-      selectedProducts = [];
-      saveSelectedProducts();
-      updateSelectedProductsList();
-      // Optionally re-render products grid to update selection state
-      const currentCards = document.querySelectorAll('.product-card');
-      if (currentCards.length > 0) {
-        const products = Array.from(currentCards).map(card => ({
-          name: card.getAttribute('data-name'),
-          brand: card.getAttribute('data-brand'),
-          image: card.querySelector('img').src,
-        }));
-        displayProducts(products);
-      }
-    });
-    const selectedProductsDiv = document.querySelector('.selected-products');
-    selectedProductsDiv.appendChild(clearBtn);
-  }
-}
+
 
 function isProductSelected(product) {
   return selectedProducts.some((p) => p.name === product.name && p.brand === product.brand);
 }
 
 /* Create HTML for displaying product cards */
-function displayProducts(products) {
+function displayProducts(products, shouldAnimate = false) {
   productsContainer.innerHTML = products
     .map(
       (product, idx) => `
     <div class="product-card${isProductSelected(product) ? ' selected' : ''}" data-name="${product.name}" data-brand="${product.brand}">
       <img src="${product.image}" alt="${product.name}">
       <div class="product-info">
-        <h3>${product.name}</h3>
+        <h3 title="${product.name}">${product.name}</h3>
         <p>${product.brand}</p>
         <button class="toggle-description-btn" data-idx="${idx}" aria-expanded="${!!expandedDescriptions[idx]}">
           ${expandedDescriptions[idx] ? 'Hide' : 'Show'} Description
@@ -296,8 +274,13 @@ function displayProducts(products) {
     )
     .join("");
 
-  // Add click listeners for selection
+  // Set cascade animation delays and add click listeners
   document.querySelectorAll(".product-card").forEach((card, idx) => {
+    // Only animate when explicitly requested
+    if (shouldAnimate) {
+      card.classList.add('animate-in');
+      card.style.setProperty('--card-index', idx + 1);
+    }
     card.addEventListener("click", (e) => {
       // Prevent card click if toggle-description-btn was clicked
       if (e.target.classList.contains("toggle-description-btn")) return;
@@ -452,16 +435,30 @@ function renderChatHistory() {
     .join("");
 }
 
-// Load text direction preference from localStorage
-function loadTextDirection() {
-  const direction = localStorage.getItem("textDirection");
-  if (direction === "rtl") {
-    document.documentElement.setAttribute("dir", "rtl");
-    rtlBtn.classList.add("active");
-    ltrBtn.classList.remove("active");
-  } else {
-    document.documentElement.setAttribute("dir", "ltr");
-    ltrBtn.classList.add("active");
-    rtlBtn.classList.remove("active");
-  }
+// Set up language detection and accessibility
+function setupGoogleTranslateObserver() {
+  // Set initial state (page content is English)
+  document.documentElement.setAttribute('lang', 'en');
+  document.documentElement.setAttribute('dir', 'ltr');
+  
+  // Listen for language changes via MutationObserver (more accessible)
+  const observer = new MutationObserver((mutations) => {
+    mutations.forEach((mutation) => {
+      if (mutation.type === 'attributes' && mutation.attributeName === 'lang') {
+        const currentLang = document.documentElement.getAttribute('lang');
+        if (currentLang) {
+          const langCode = currentLang.split('-')[0];
+          setDirectionFromLanguage(langCode);
+        }
+      }
+    });
+  });
+  
+  // Observe changes to the html element's lang attribute
+  observer.observe(document.documentElement, {
+    attributes: true,
+    attributeFilter: ['lang']
+  });
+  
+
 }
