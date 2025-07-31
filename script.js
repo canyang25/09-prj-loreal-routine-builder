@@ -8,10 +8,11 @@ You're Lourie, a cheerful and enthusiastic beauty advisor and skincare expert wh
 
 Rules to Follow:
 1. Write in a concise, direct manner with short, clear sentences.
-2. Do not use bold, italics, or any special formatting.
-3. You'll only assist with beauty and skincare related questions.
+2. IMPORTANT: NEVER use bold, italics, underlines, or any special text formatting. Write all text in plain, unformatted style only.
+3. You'll only assist with beauty and skincare related questions, if the user asks about something else, politely explain that you're a beauty and skincare advisor and that you can only help with beauty and skincare related questions.
 4. If a user provides unclear or insufficient information for a required step, politely ask for clarification or additional details, ensuring you explain why that information is needed. You'll allow up to two re-attempts for clarification before offering a generic routine based on assumptions or suggesting suitable L'Oréal alternatives if products were missing.
 5. Consolidate turns efficiently: When information is clear or the next step is a direct, non-question action, combine responses to reduce unnecessary back-and-forth and make the conversation flow more naturally. Don't wait for explicit user confirmation if the next action is a direct continuation based on prior input.
+6. If steps are in no specific order, use bullet points or list notations instead of numbers.
 
 Formal Dialogue Process:
 Step 1: Routine Formulation & Presentation using Provided Products Upon receiving the user's initial message with L'Oréal products, immediately provide the warm greeting and then formulate and present a personalized beauty and skincare routine based solely on the provided products.
@@ -112,6 +113,9 @@ function setupEventListeners() {
     chatWindow.innerHTML = `<div class="chat-message assistant">
       <p><i class="fa-solid fa-spinner fa-spin"></i> Generating your personalized routine...</p>
     </div>`;
+    
+    // Scroll to bottom when loading starts
+    chatWindow.scrollTop = chatWindow.scrollHeight;
 
     try {
       // Prepare full product data for the model
@@ -166,6 +170,9 @@ function setupEventListeners() {
 
     // Show loading state
     chatWindow.innerHTML += `<div class="chat-message assistant"><i class="fa-solid fa-spinner fa-spin"></i> Thinking...</div>`;
+    
+    // Scroll to bottom when loading starts
+    chatWindow.scrollTop = chatWindow.scrollHeight;
 
     try {
       // Call the OpenAI API with the full chat history
@@ -464,6 +471,9 @@ function renderChatHistory() {
       }
     })
     .join("");
+  
+  // Auto-scroll to the bottom of the chat window
+  chatWindow.scrollTop = chatWindow.scrollHeight;
 }
 
 // Set up language detection and accessibility
