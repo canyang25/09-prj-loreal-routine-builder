@@ -1,0 +1,25 @@
+{
+  "image": "mcr.microsoft.com/devcontainers/universal:linux",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "GitHub.copilot",
+        "ms-vscode.live-server",
+        "esbenp.prettier-vscode"
+      ],
+      "settings": {
+        "livePreview.autoRefreshPreview": "On All Changes in Editor",
+        "editor.minimap.enabled": false,
+        "workbench.colorTheme": "Visual Studio Dark",
+        "editor.tabSize": 2,
+        "editor.insertSpaces": true,
+        "editor.detectIndentation": false,
+        "editor.wordWrap": "on",
+        "editor.stickyScroll.enabled": false,
+        "editor.formatOnSave": true,
+        "editor.defaultFormatter": "esbenp.prettier-vscode"
+      }
+    }
+  },
+  "postAttachCommand": "rm -rf ~/.cache/* ~/.vscode-server/extensionsCache/* ~/.vscode-server/data/User/workspaceStorage/* ~/.config/Code/Cache/* ~/.config/Code/CachedData/*"
+}

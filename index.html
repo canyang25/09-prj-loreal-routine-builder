@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>L'Oréal Product Advisor</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;500;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"
+    />
+    <link rel="stylesheet" href="style.css" />
+
+  </head>
+
+  <body>
+    <div class="page-wrapper">
+      <!------- Header / Branding ------->
+      <header class="site-header">
+        <a href="https://www.loreal.com" target="_blank" rel="noopener noreferrer">
+          <img src="img/loreal-logo.png" alt="L'Oréal Logo" class="logo" />
+        </a>
+        <h1 class="site-title">Smart Routine &amp; Product Advisor</h1>
+      </header>
+
+      <!-- Category Filter -->
+      <div class="search-section">
+        <select id="categoryFilter">
+          <option value="" selected>Choose a Category</option>
+          <option value="cleanser">Cleansers</option>
+          <option value="moisturizer">Moisturizers & Treatments</option>
+          <option value="haircare">Haircare</option>
+          <option value="makeup">Makeup</option>
+          <option value="hair color">Hair Color</option>
+          <option value="hair styling">Hair Styling</option>
+          <option value="men's grooming">Men's Grooming</option>
+          <option value="suncare">Suncare</option>
+          <option value="fragrance">Fragrance</option>
+        </select>
+      </div>
+
+      <!-- Products Grid -->
+      <div id="productsContainer" class="products-grid"></div>
+
+      <!-- Selected Products -->
+      <div class="selected-products">
+        <h2>Selected Products</h2>
+        <div id="selectedProductsList"></div>
+        <button id="generateRoutine" class="generate-btn">
+          <i class="fa-solid fa-wand-magic-sparkles"></i> Generate Routine
+        </button>
+      </div>
+
+      <!------- Chat Area ------->
+      <section class="chatbox">
+        <div class="chat-header">
+          <h2>Let's Build Your Routine</h2>
+          <button id="clearChat" class="clear-chat-btn">
+            <i class="fa-solid fa-trash"></i> Clear Chat
+          </button>
+        </div>
+        <div id="chatWindow" class="chat-window"></div>
+
+        <form id="chatForm" class="chat-form">
+          <label for="userInput" class="visually-hidden">Message</label>
+          <input
+            id="userInput"
+            name="userInput"
+            type="text"
+            placeholder="Ask me about products or routines…"
+            autocomplete="off"
+            required
+          />
+          <button type="submit" id="sendBtn">
+            <i class="fa-solid fa-paper-plane"></i>
+            <span class="visually-hidden">Send</span>
+          </button>
+        </form>
+      </section>
+
+      <!------- Footer Links ------->
+      <footer class="site-footer">
+        <p>&copy; 2025 L'Oréal. All rights reserved.</p>
+        <nav>
+          <!-- These URLs are placeholders -->
+          <a href="https://www.loreal.com/en/privacy-policy/">Privacy Policy</a>
+          <a href="https://www.loreal.com/en/terms-of-use/">Terms of Use</a>
+          <a href="https://www.loreal.com/en/contact/">Contact</a>
+        </nav>
+      </footer>
+    </div>
+
+    <!-- Using Cloudflare Workers for API requests with environment variables -->
+    <script src="script.js"></script>
+    
+    <!-- Fix for search dropdown hover/focus issue -->
+    <script>
+      document.addEventListener('click', function(e) {
+        if (!e.target.closest('.search-section')) {
+          document.querySelector('#categoryFilter').blur();
+        }
+      });
+    </script>
+  </body>
+</html>
